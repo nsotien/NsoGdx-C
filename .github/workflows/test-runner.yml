@@ -1,0 +1,29 @@
+name: 🧪 Runner Availability Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "Ubuntu OK at $(date)"
+
+  test-macos-13:
+    runs-on: macos-13
+    timeout-minutes: 5
+    steps:
+      - run: echo "macos-13 OK at $(date)"
+
+  test-macos-14:
+    runs-on: macos-14
+    timeout-minutes: 5
+    steps:
+      - run: echo "macos-14 OK at $(date)"
+
+  test-macos-latest:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "macos-latest OK at $(date)"

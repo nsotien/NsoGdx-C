@@ -1,0 +1,7 @@
+mahoasaukhibuild=true
+thongbaogame=https://raw.githubusercontent.com/thachdeptrai/listIP/refs/heads/main/thongbaogame.txt
+ipgame=https://gist.githubusercontent.com/cuongcxz1010-hue/4da50f5f4a564abfb30464a1840197e6/raw/server_config.txt
+tenphienban=NSO217VIP
+tennguoibuild=CUONGNSO
+keyserver=NSOCUONG
+thongbaochao=Chao Mung Ban Toi Voi nsoC

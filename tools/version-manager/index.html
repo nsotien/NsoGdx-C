@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuongNSO Version Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">⚔️</span>
+                <div>
+                    <h1>CuongNSO Version Manager</h1>
+                    <span class="logo-sub">LibGDX Build Tool</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Đang kết nối...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" id="tabConfig" onclick="switchTab('config')">⚙️ Cấu hình</button>
+        <button class="tab-btn" id="tabLogo" onclick="switchTab('logo')">🖼️ Logo</button>
+    </nav>
+
+    <main class="main">
+        <!-- Left Panel -->
+        <div class="left-panel">
+
+            <!-- Version Card -->
+            <div class="card" id="versionCard">
+                <div class="card-header">
+                    <span class="card-icon">🏷️</span>
+                    <h2>Phiên bản</h2>
+                    <div class="card-badge" id="versionBadge">...</div>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Version Code <span class="form-hint">(số nguyên)</span></label>
+                            <input type="number" id="versionCode" placeholder="1" min="1" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>Version Name <span class="form-hint">(hiển thị)</span></label>
+                            <input type="text" id="versionName" placeholder="1.0" class="input-field">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btnSaveVersion">
+                        <span class="btn-icon">💾</span> Lưu phiên bản
+                    </button>
+                </div>
+            </div>
+
+            <!-- Server List Card -->
+            <div class="card" id="serverCard">
+                <div class="card-header">
+                    <span class="card-icon">🌐</span>
+                    <h2>Danh sách máy chủ</h2>
+                    <div class="card-badge" id="serverCount">0 server</div>
+                </div>
+                <div class="card-body">
+                    <div class="server-hint">
+                        Format: <code>Tên : IP : Port : LoginType : Lang</code><br>
+                        <small>LoginType: 0=thường, 1=yêu cầu đăng nhập &nbsp;|&nbsp; Lang: 0=VI, 1=EN</small>
+                    </div>
+
+                    <!-- Server Table -->
+                    <div class="table-wrapper">
+                        <table class="server-table" id="serverTable">
+                            <thead>
+                                <tr>
+                                    <th>Tên</th>
+                                    <th>IP/Domain</th>
+                                    <th>Port</th>
+                                    <th>Login</th>
+                                    <th>Lang</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="serverTableBody">
+                                <!-- Rows go here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Add Server Form -->
+                    <div class="add-server-form" id="addServerForm" style="display:none;">
+                        <div class="add-form-title" id="addFormTitle">➕ Thêm máy chủ mới</div>
+                        <div class="add-form-grid">
+                            <input type="text" id="newServerName" placeholder="Tên (ví dụ: NSO SV1)"
+                                class="input-field input-sm">
+                            <input type="text" id="newServerIp" placeholder="IP hoặc domain"
+                                class="input-field input-sm">
+                            <input type="number" id="newServerPort" placeholder="Port" value="14444"
+                                class="input-field input-sm">
+                            <select id="newServerLogin" class="input-field input-sm select-field">
+                                <option value="0">0 - Thường</option>
+                                <option value="1">1 - Yêu cầu login</option>
+                            </select>
+                            <select id="newServerLang" class="input-field input-sm select-field">
+                                <option value="0">0 - Tiếng Việt</option>
+                                <option value="1">1 - English</option>
+                            </select>
+                        </div>
+                        <div class="add-form-actions">
+                            <button class="btn btn-success btn-sm" id="btnConfirmAdd">✓ Xác nhận</button>
+                            <button class="btn btn-ghost btn-sm" id="btnCancelAdd">✕ Hủy</button>
+                        </div>
+                    </div>
+
+                    <div class="server-actions">
+                        <button class="btn btn-outline btn-sm" id="btnAddServer">
+                            <span>➕</span> Thêm máy chủ
+                        </button>
+                        <button class="btn btn-primary" id="btnSaveServers">
+                            <span class="btn-icon">💾</span> Lưu danh sách
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+
+            <!-- Build Card -->
+            <div class="card" id="buildCard">
+                <div class="card-header">
+                    <span class="card-icon">🔨</span>
+                    <h2>Build</h2>
+                    <div class="build-status-tag" id="buildStatusTag">Sẵn sàng</div>
+                </div>
+                <div class="card-body">
+                    <div class="build-buttons">
+                        <button class="btn btn-build btn-apk" id="btnBuildApk">
+                            <div class="build-btn-icon">📱</div>
+                            <div class="build-btn-text">
+                                <span class="build-btn-title">Build APK</span>
+                                <span class="build-btn-sub">Android Debug</span>
+                            </div>
+                        </button>
+                        <button class="btn btn-build btn-pc" id="btnBuildPc">
+                            <div class="build-btn-icon">🖥️</div>
+                            <div class="build-btn-text">
+                                <span class="build-btn-title">Build Desktop</span>
+                                <span class="build-btn-sub">PC/Windows JAR</span>
+                            </div>
+                        </button>
+                        <button class="btn btn-build btn-ios" id="btnBuildIos">
+                            <div class="build-btn-icon">🍎</div>
+                            <div class="build-btn-text">
+                                <span class="build-btn-title">Build iOS</span>
+                                <span class="build-btn-sub">GitHub Actions</span>
+                            </div>
+                        </button>
+                        <button class="btn btn-build btn-java148" id="btnBuildClient148">
+                            <div class="build-btn-icon">☕</div>
+                            <div class="build-btn-text">
+                                <span class="build-btn-title">Client 148 VIP</span>
+                                <span class="build-btn-sub">Java + ProGuard</span>
+                            </div>
+                        </button>
+                        <button class="btn btn-build btn-java217" id="btnBuildClient217">
+                            <div class="build-btn-icon">☕</div>
+                            <div class="build-btn-text">
+                                <span class="build-btn-title">Client 217 VIP</span>
+                                <span class="build-btn-sub">Java + ProGuard</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- iOS GitHub Settings -->
+                    <div class="ios-settings" id="iosSettings">
+                        <div class="ios-settings-header" onclick="toggleIosSettings()">
+                            <span>⚙️ Cài đặt GitHub Actions</span>
+                            <span id="iosSettingsArrow">▼</span>
+                        </div>
+                        <div class="ios-settings-body" id="iosSettingsBody" style="display:none;">
+                            <div class="form-group">
+                                <label>GitHub Token <span class="form-hint">(repo + workflow scope)</span></label>
+                                <input type="password" id="githubToken" class="input-field input-sm"
+                                    placeholder="ghp_xxxxxxxxxxxx">
+                            </div>
+                            <div class="form-group">
+                                <label>Repository <span class="form-hint">(owner/repo)</span></label>
+                                <input type="text" id="githubRepo" class="input-field input-sm"
+                                    placeholder="cuongcxz1010-hue/NsoAgeClient" value="cuongcxz1010-hue/NsoAgeClient">
+                            </div>
+                            <div class="form-group">
+                                <label>Branch</label>
+                                <input type="text" id="githubBranch" class="input-field input-sm" placeholder="main"
+                                    value="main">
+                            </div>
+                            <button class="btn btn-outline btn-sm" id="btnSaveIosSettings">💾 Lưu cài đặt</button>
+                        </div>
+                    </div>
+
+                    <!-- iOS Build Status Panel -->
+                    <div class="ios-status-panel" id="iosStatusPanel" style="display:none;">
+                        <div class="ios-status-header">
+                            <span class="ios-status-icon" id="iosStatusIcon">⏳</span>
+                            <span class="ios-status-text" id="iosStatusText">Đang trigger build...</span>
+                            <a class="ios-status-link" id="iosActionsLink" href="#" target="_blank"
+                                style="display:none;">📋 Xem log</a>
+                        </div>
+                        <div class="ios-progress-bar">
+                            <div class="ios-progress-fill" id="iosProgressFill"></div>
+                        </div>
+                        <div class="ios-status-detail" id="iosStatusDetail"></div>
+                    </div>
+
+                    <!-- Full Package Build -->
+                    <div class="full-build-section">
+                        <div class="full-build-header">
+                            <span class="card-icon">📦</span>
+                            <span>Build phiên bản hoàn chỉnh</span>
+                        </div>
+                        <div class="full-build-row">
+                            <input type="text" id="appNameInput" placeholder="Tên app (vd: NSO218PC)"
+                                class="input-field input-sm" value="">
+                            <button class="btn btn-build-full" id="btnBuildPcFull">
+                                🚀 Build Full Package
+                            </button>
+                        </div>
+                        <div class="full-build-hint">Tạo thư mục hoàn chỉnh: EXE + Runtime + Icon (dùng jpackage)</div>
+                    </div>
+
+                    <button class="btn btn-danger btn-sm" id="btnStopBuild" style="display:none;">
+                        🛑 Dừng build
+                    </button>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-wrap" id="progressWrap" style="display:none;">
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-label" id="progressLabel">Đang build...</span>
+                    </div>
+
+                    <!-- Build Output Result -->
+                    <div class="output-card" id="outputCard" style="display:none;">
+                        <div class="output-card-header">
+                            <span id="outputIcon">📦</span>
+                            <span class="output-card-title" id="outputTitle">File đã tạo</span>
+                            <span class="output-size-badge" id="outputSize"></span>
+                        </div>
+                        <div class="output-filename" id="outputFilename"></div>
+                        <div class="output-path" id="outputPath" title="Đường dẫn đầy đủ"></div>
+                        <div class="output-actions">
+                            <button class="btn btn-outline btn-sm" id="btnOpenFolder">
+                                📂 Mở thư mục
+                            </button>
+                            <button class="btn btn-ghost btn-sm" id="btnCopyPath" title="Copy đường dẫn">
+                                📋 Copy path
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Java IP Editor Card -->
+            <div class="card" id="javaIpCard">
+                <div class="card-header">
+                    <span class="card-icon">☕</span>
+                    <h2>IP Servers — Client Java</h2>
+                    <div class="card-badge" id="javaIpBadge">0 server</div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Đổi IP cho phiên bản</label>
+                        <select id="javaClientTarget" class="input-field select-field">
+                            <option value="148">Client 148 VIP</option>
+                            <option value="217">Client 217 VIP</option>
+                        </select>
+                    </div>
+                    <div class="form-hint">
+                        Mỗi dòng 1 server, format:
+                        <code>Name:IP:Port:LoginType:Lang</code>
+                    </div>
+                    <textarea id="javaServersText" rows="7" class="input-field"
+                              style="font-family: 'JetBrains Mono', monospace; font-size: 12px;"
+                              placeholder="HacAnh:cc2.hacanhninja.com:14444:0:0"></textarea>
+                    <button class="btn btn-primary" id="btnSaveJavaServers" style="margin-top: 8px;">
+                        <span class="btn-icon">💾</span> Lưu IP list
+                    </button>
+                </div>
+            </div>
+
+            <!-- Log Card -->
+            <div class="card card-log" id="logCard">
+                <div class="card-header">
+                    <span class="card-icon">📋</span>
+                    <h2>Log Build</h2>
+                    <button class="btn btn-ghost btn-xs" id="btnClearLog">🗑 Xóa log</button>
+                </div>
+                <div class="log-terminal" id="logTerminal">
+                    <div class="log-welcome">
+                        <pre>
+  ██████╗██╗   ██╗ ██████╗ ███╗  ██╗ ██████╗
+ ██╔════╝██║   ██║██╔═══██╗████╗ ██║██╔════╝
+ ██║     ██║   ██║██║   ██║██╔██╗██║██║  ███╗
+ ██║     ██║   ██║██║   ██║██║╚████║██║   ██║
+ ╚██████╗╚██████╔╝╚██████╔╝██║ ╚███║╚██████╔╝
+  ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚══╝ ╚═════╝
+  ███╗   ██╗███████╗ ██████╗
+  ████╗  ██║██╔════╝██╔═══██╗
+  ██╔██╗ ██║███████╗██║   ██║
+  ██║╚██╗██║╚════██║██║   ██║
+  ██║ ╚████║███████║╚██████╔╝
+  ╚═╝  ╚═══╝╚══════╝ ╚═════╝
+  Version Manager v1.0 - San sang!</pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Logo Tab -->
+    <div class="logo-tab" id="logoTab" style="display:none;">
+
+        <!-- Current Logo Card -->
+        <div class="card logo-current-card">
+            <div class="card-header">
+                <span class="card-icon">🖼️</span>
+                <h2>Logo hiện tại</h2>
+                <div class="card-badge" id="logoPillowBadge">Đang kiểm tra...</div>
+            </div>
+            <div class="card-body logo-current-body">
+                <div class="logo-preview-wrap">
+                    <img id="logoCurrentImg" src="" alt="Logo hiện tại" class="logo-current-img" />
+                    <div class="logo-no-img" id="logoNoImg" style="display:none;">❌ Chưa tìm thấy iconapp.png</div>
+                </div>
+                <div class="logo-current-info">
+                    <div class="logo-info-row"><span class="logo-info-label">File gốc:</span><code>iconapp.png</code>
+                    </div>
+                    <div class="logo-info-row"><span class="logo-info-label">Kích thước:</span><span>256 × 256 px</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="card logo-upload-card">
+            <div class="card-header">
+                <span class="card-icon">📤</span>
+                <h2>Thay logo mới</h2>
+                <div class="card-badge">PNG / JPG / WEBP</div>
+            </div>
+            <div class="card-body">
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-content" id="dropZoneContent">
+                        <div class="drop-icon">🖼️</div>
+                        <p class="drop-title">Kéo &amp; thả ảnh vào đây</p>
+                        <p class="drop-sub">hoặc click để chọn file</p>
+                        <input type="file" id="logoFileInput" accept="image/*" style="display:none;">
+                    </div>
+                    <img id="logoPreviewImg" src="" alt="Preview" class="logo-preview-new" style="display:none;">
+                </div>
+
+                <!-- File name & actions -->
+                <div class="logo-upload-meta" id="logoUploadMeta" style="display:none;">
+                    <span class="logo-filename-badge" id="logoFilenameBadge">📄 ảnh.png</span>
+                    <button class="btn btn-ghost btn-sm" id="btnLogoReset">✕ Chọn lại</button>
+                </div>
+
+                <!-- Target List -->
+                <div class="logo-targets">
+                    <div class="logo-targets-title">📋 Sẽ cập nhật các file sau:</div>
+                    <div class="logo-targets-grid">
+                        <div class="target-item">🖥️ <code>iconapp.png</code> <span class="target-size">256×256</span>
+                        </div>
+                        <div class="target-item">📦 <code>assets/ + Client VIP (×6)</code> <span
+                                class="target-size">16–1024</span></div>
+                        <div class="target-item">📱 <code>ic_launcher-playstore.png</code> <span
+                                class="target-size">1024×1024</span></div>
+                        <div class="target-item">📱 <code>mipmap-mdpi</code> <span class="target-size">48×48</span>
+                        </div>
+                        <div class="target-item">📱 <code>mipmap-hdpi</code> <span class="target-size">72×72</span>
+                        </div>
+                        <div class="target-item">📱 <code>mipmap-xhdpi</code> <span class="target-size">96×96</span>
+                        </div>
+                        <div class="target-item">📱 <code>mipmap-xxhdpi</code> <span class="target-size">144×144</span>
+                        </div>
+                        <div class="target-item">📱 <code>mipmap-xxxhdpi</code> <span class="target-size">192×192</span>
+                        </div>
+                        <div class="target-item">📱 <em>+ round variants (×5)</em> <span
+                                class="target-size">48–192</span></div>
+                        <div class="target-item">🍎 <code>iOS AppIcon (×18)</code> <span
+                                class="target-size">20–1024</span></div>
+                    </div>
+                </div>
+
+                <!-- Apply Button -->
+                <button class="btn btn-primary btn-apply-logo" id="btnApplyLogo" disabled>
+                    <span class="btn-icon">✅</span> Áp dụng tất cả (36 files)
+                </button>
+
+                <!-- Result -->
+                <div class="logo-result" id="logoResult" style="display:none;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✏️ Chỉnh sửa máy chủ</h3>
+                <button class="modal-close" id="btnEditModalClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tên máy chủ</label>
+                    <input type="text" id="editName" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>IP / Domain</label>
+                    <input type="text" id="editIp" class="input-field">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Port</label>
+                        <input type="number" id="editPort" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <label>Login Type</label>
+                        <select id="editLogin" class="input-field select-field">
+                            <option value="0">0 - Thường</option>
+                            <option value="1">1 - Yêu cầu login</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select id="editLang" class="input-field select-field">
+                            <option value="0">0 - VI</option>
+                            <option value="1">1 - EN</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnEditSave">💾 Lưu chỉnh sửa</button>
+                <button class="btn btn-ghost" id="btnEditCancel">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

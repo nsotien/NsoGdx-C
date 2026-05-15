@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+<project name="NinjaSchool217" default="default" basedir=".">
+    <description>Builds, tests, and runs the project NinjaSchool217</description>
+    <import file="nbproject/build-impl.xml"/>
+    <target name="-pre-init">
+        <property file="configbuild.txt"/>
+        <echo message="### BUILD CONFIGURATION LOADED ###"/>
+        <echo message="Version Name: ${tenphienban}"/>
+        <echo message="Builder:      ${tennguoibuild}"/>
+        <echo message="Obfuscate:    ${mahoasaukhibuild}"/>
+        
+        <!-- Define dynamic properties -->
+        <property name="final.jar.name" value="${tenphienban}.jar"/>
+        <property name="obf.jar.name" value="${tenphienban}_Obf.jar"/>
+    </target>
+
+    <target name="-pre-compile" depends="-pre-init">
+        <echo message="Syncing configuration for ${tenphienban}..."/>
+        
+        <!-- Update UpdateServer.java -->
+        <replaceregexp file="src/UpdateServer.java"
+                       match="public static String thongbaogame\s+=\s+&quot;.*&quot;;"
+                       replace="public static String thongbaogame = &quot;${thongbaogame}&quot;;"
+                       byline="true"/>
+        <replaceregexp file="src/UpdateServer.java"
+                       match="public static String ipgame\s+=\s+&quot;.*&quot;;"
+                       replace="public static String ipgame = &quot;${ipgame}&quot;;"
+                       byline="true"/>
+        <replaceregexp file="src/UpdateServer.java"
+                       match="public static String keyserver\s+=\s+&quot;.*&quot;;"
+                       replace="public static String keyserver = &quot;${keyserver}&quot;;"
+                       byline="true"/>
+        <replaceregexp file="src/UpdateServer.java"
+                       match="public static String branding\s+=\s+&quot;.*&quot;;"
+                       replace="public static String branding = &quot;${tenphienban}&quot;;"
+                       byline="true"/>
+        <replaceregexp file="src/UpdateServer.java"
+                       match="public static String tennguoibuild\s+=\s+&quot;.*&quot;;"
+                       replace="public static String tennguoibuild = &quot;${tennguoibuild}&quot;;"
+                       byline="true"/>
+        <replaceregexp file="src/UpdateServer.java"
+                       match="public static String thongbaochao\s+=\s+&quot;.*&quot;;"
+                       replace="public static String thongbaochao = &quot;${thongbaochao}&quot;;"
+                       byline="true"/>
+
+        <!-- Update project.properties to influence NetBeans build -->
+        <echo message="Updating project.properties..."/>
+        <replaceregexp file="nbproject/project.properties"
+                       match="(dist\.jar=\$\{dist\.dir\}/).*\.jar"
+                       replace="\1${tenphienban}.jar"
+                       byline="true"/>
+        <replaceregexp file="nbproject/project.properties"
+                       match="(dist\.jlink\.output=\$\{dist\.jlink\.dir\}/).*"
+                       replace="\1${tenphienban}"
+                       byline="true"/>
+        <replaceregexp file="nbproject/project.properties"
+                       match="(jlink\.launcher\.name=).*"
+                       replace="\1${tenphienban}"
+                       byline="true"/>
+
+        <!-- Update MANIFEST.MF with robust regex -->
+        <echo message="Updating MANIFEST.MF metadata..."/>
+        <replaceregexp file="src/META-INF/MANIFEST.MF"
+                       match="MIDlet-Name:\s+.*"
+                       replace="MIDlet-Name: ${tenphienban}"
+                       byline="true"/>
+        <replaceregexp file="src/META-INF/MANIFEST.MF"
+                       match="MIDlet-Vendor:\s+.*"
+                       replace="MIDlet-Vendor: ${tennguoibuild}"
+                       byline="true"/>
+        <replaceregexp file="src/META-INF/MANIFEST.MF"
+                       match="MIDlet-1:\s+.*"
+                       replace="MIDlet-1: ${tenphienban},/icon.png,GameMidlet"
+                       byline="true"/>
+
+        <!-- Update proguard.pro with robust regex -->
+        <echo message="Updating proguard.pro paths..."/>
+        <replaceregexp file="proguard.pro"
+                       match="-injars\s+dist/.*\.jar"
+                       replace="-injars      dist/${final.jar.name}"
+                       byline="true"/>
+        <replaceregexp file="proguard.pro"
+                       match="-outjars\s+dist/.*\.jar"
+                       replace="-outjars     dist/${obf.jar.name}"
+                       byline="true"/>
+    </target>
+
+    <target name="-post-jar" depends="-pre-init">
+        <echo message="JAR build process finished. Synchronizing names..."/>
+        
+        <!-- Self-healing: Rename whatever JAR NetBeans built to the target name.
+             This handles the case where project.properties was just updated on disk 
+             but Ant still has the old name in its active memory. -->
+        <move todir="dist" failonerror="false">
+            <fileset dir="dist">
+                <include name="*.jar"/>
+                <exclude name="*_Obf.jar"/>
+                <exclude name="${final.jar.name}"/>
+            </fileset>
+            <mapper type="merge" to="${final.jar.name}"/>
+        </move>
+
+        <available file="dist/${final.jar.name}" property="jar.exists"/>
+        <fail message="Could not find built JAR at dist/${final.jar.name}" unless="jar.exists"/>
+
+        <!-- Run ProGuard if requested -->
+        <condition property="do.obfuscate">
+            <equals arg1="${mahoasaukhibuild}" arg2="true"/>
+        </condition>
+        <antcall target="run-proguard"/>
+    </target>
+
+    <target name="run-proguard" if="do.obfuscate">
+        <echo message="Running ProGuard: ${final.jar.name} -> ${obf.jar.name}..."/>
+        <java jar="proguard-7.6.0/lib/proguard.jar" fork="true" failonerror="true">
+            <arg value="@proguard.pro"/>
+        </java>
+    </target>
+</project>

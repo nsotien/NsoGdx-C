@@ -1,0 +1,12 @@
+{
+    "name": "cuongnso-version-manager",
+    "version": "1.0.0",
+    "description": "CuongNSO Version Manager - LibGDX Build Tool",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "sharp": "^0.33.0"
+    }
+}

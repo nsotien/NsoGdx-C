@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.7
+MIDlet-1: NSO217VIP,/icon.png,GameMidlet
+MIDlet-Vendor: CUONGNSO
+MIDlet-Version: 1.0
+MIDlet-Name: NSO217VIP
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.1

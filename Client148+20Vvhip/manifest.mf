@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+MIDlet-Name: CUONGNSO
+MIDlet-Version: 1.4.8
+MIDlet-Vendor: CUONGNSO
+MIDlet-1: CUONGNSO, /icon.png, GameMidlet

@@ -1,0 +1,82 @@
+name: 🍎 Build iOS (IPA)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      # Bước 1: Tải code
+      - name: ⬇️ Checkout source code
+        uses: actions/checkout@v4
+
+      # Bước 2: Cài Java 17
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Bước 3: Cache Gradle & RoboVM
+      - name: 📦 Cache Gradle & RoboVM
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.robovm/cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Bước 4: Cấp quyền chạy gradlew
+      - name: 🔑 Make gradlew executable
+        run: chmod +x gradlew
+
+      # Bước 5: Xem tất cả iOS tasks có thể dùng
+      - name: 🔍 List available iOS tasks
+        run: ./gradlew :ios:tasks --no-daemon 2>&1 || true
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+      # Bước 6: Build iOS IPA (unsigned) bằng createIPA task
+      - name: 🔨 Build iOS IPA (unsigned)
+        run: ./gradlew ios:createIPA --no-daemon --stacktrace
+        env:
+          JAVA_OPTS: "-Xmx4g"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false"
+
+      # Bước 7: Tìm file IPA đã tạo
+      - name: 🔍 Find IPA files
+        if: always()
+        run: |
+          echo "=== Tìm .ipa files ==="
+          find . -name "*.ipa" 2>/dev/null || echo "Không tìm thấy .ipa"
+          echo ""
+          echo "=== Cấu trúc ios/build ==="
+          ls -R ios/build/ 2>/dev/null || echo "ios/build không tồn tại"
+          echo ""
+          echo "=== Cấu trúc ios/robovm-build ==="
+          ls -R ios/robovm-build/ 2>/dev/null || echo "ios/robovm-build không tồn tại"
+
+      # Bước 8: Upload IPA
+      - name: 📤 Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ios-build-${{ github.run_number }}
+          path: |
+            ios/build/**/*.ipa
+            ios/robovm-build/**/*.ipa
+          if-no-files-found: warn
+          retention-days: 14

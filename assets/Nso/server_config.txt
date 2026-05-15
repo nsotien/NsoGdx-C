@@ -1,0 +1,23 @@
+# ============================================================
+# FILE CAU HINH IP SERVER - NSO CLIENT
+# ============================================================
+# Upload file nay len hosting/GitHub, client se tu dong doc IP tu day.
+# Khi muon thay doi IP, chi can sua file nay va upload lai.
+# KHONG CAN BUILD LAI CLIENT.
+#
+# Format moi dong:  TenServer:IP:Port:ServerLogin:Language
+#   - TenServer: ten hien thi trong game
+#   - IP: dia chi IP cua server
+#   - Port: cong ket noi (thuong la 14444)
+#   - ServerLogin: 0 = server chinh, 1 = server phu
+#   - Language: 0 = Tieng Viet, 1 = ngon ngu khac
+#
+# Cach 1: Viet tat ca tren 1 dong, cach nhau boi dau phay:
+#   Server1:1.2.3.4:14444:0:0,Server2:5.6.7.8:14444:1:0
+#
+# Cach 2: Moi server 1 dong (de doc hon):
+#   Code se tu dong noi cac dong lai voi nhau.
+#   Dong bat dau bang # se bi bo qua (comment).
+# ============================================================
+
+Bokken:112.213.84.18:14444:0:0

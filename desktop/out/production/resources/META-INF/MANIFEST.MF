@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Main-Class: com.monkey.nso.DesktopLauncher
+Class-Path: lwjgl-platform-2.9.3-natives-windows.jar jlayer-1.0.1-gdx.ja
+ r jorbis-0.0.17.jar gdx-freetype-1.12.1.jar lwjgl-2.9.3.jar gdx-freetyp
+ e-platform-1.12.1-natives-desktop.jar jutils-1.0.0.jar jinput-platform-
+ 2.0.5-natives-linux.jar jinput-platform-2.0.5-natives-osx.jar gdx-platf
+ orm-1.12.1-natives-desktop.jar gdx-jnigen-loader-2.3.1.jar lwjgl-platfo
+ rm-2.9.3-natives-osx.jar lwjgl-platform-2.9.3-natives-linux.jar jinput-
+ 2.0.5.jar gdx-backend-lwjgl-1.12.1.jar gdx-1.12.1.jar jinput-platform-2
+ .0.5-natives-windows.jar
+

@@ -1,0 +1,61 @@
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = ["../assets"]
+
+project.ext.mainClassName = "com.monkey.nso.DesktopLauncher"
+project.ext.assetsDir = new File("../assets")
+
+import org.gradle.internal.os.OperatingSystem
+
+tasks.register('run', JavaExec) {
+    dependsOn classes
+    mainClass = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+        // Required to run on macOS
+        jvmArgs += "-XstartOnFirstThread"
+    }
+}
+
+tasks.register('debug', JavaExec) {
+    dependsOn classes
+    mainClass = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+    debug = true
+}
+
+tasks.register('dist', Jar) {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+
+    doLast {
+        def outDir = destinationDirectory.get().asFile
+        def jarName = archiveFileName.get()
+        new File(outDir, "run.bat").text =
+            "@echo off\r\ncd /d \"%~dp0\"\r\nstart \"\" javaw -jar \"${jarName}\" %*\r\n"
+        new File(outDir, "run-hd.bat").text =
+            "@echo off\r\ncd /d \"%~dp0\"\r\nstart \"\" javaw -jar \"${jarName}\" --size=hd\r\n"
+        new File(outDir, "run-fullhd.bat").text =
+            "@echo off\r\ncd /d \"%~dp0\"\r\nstart \"\" javaw -jar \"${jarName}\" --size=fullhd\r\n"
+        println "Created launchers: run.bat, run-hd.bat, run-fullhd.bat in ${outDir}"
+    }
+}
+
+
+dist.dependsOn classes
+
+eclipse.project.name = appName + "-desktop"
